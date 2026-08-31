@@ -1,6 +1,6 @@
 {
   "name": "context-dev-ai-tools",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Community-built Vercel AI SDK tools for the context.dev web data API (unofficial).",
   "type": "module",
   "license": "MIT",
