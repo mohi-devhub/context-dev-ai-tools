@@ -15,7 +15,13 @@ const inputSchema = z.object({
     .describe(
       "Maximum number of pages to crawl. Defaults to 10 and is capped here well below the API's own ceiling — crawling is credit-metered per page, so an agent should not be able to trigger a large crawl without the caller raising this explicitly.",
     ),
-  maxDepth: z.number().int().min(1).max(10).optional().describe("Maximum link depth from the starting URL."),
+  maxDepth: z
+    .number()
+    .int()
+    .min(0)
+    .max(10)
+    .optional()
+    .describe("Maximum link depth from the starting URL (0 = only the starting page). No limit if omitted."),
   urlRegex: z.string().optional().describe("Only crawl URLs matching this regular expression."),
   followSubdomains: z
     .boolean()

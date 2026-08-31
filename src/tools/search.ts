@@ -10,7 +10,7 @@ const inputSchema = z.object({
     .describe(
       "Search query. Accepts natural language as well as Google-style operators such as site:, -site:, inurl:, intitle:, quoted phrases, and OR.",
     ),
-  numResults: z.number().int().min(1).max(50).optional().describe("Number of results to return. Defaults to 10."),
+  numResults: z.number().int().min(10).max(100).optional().describe("Number of results to request (10-100). Defaults to 10."),
   freshness: z
     .enum(["last_24_hours", "last_week", "last_month", "last_year"])
     .optional()
