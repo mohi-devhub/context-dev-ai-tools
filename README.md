@@ -1,5 +1,8 @@
 # context-dev-ai-tools
 
+[![npm version](https://img.shields.io/npm/v/context-dev-ai-tools.svg)](https://www.npmjs.com/package/context-dev-ai-tools)
+[![license](https://img.shields.io/npm/l/context-dev-ai-tools.svg)](./LICENSE)
+
 > **Community-built, unofficial.** This package wraps the official [`context.dev`](https://www.npmjs.com/package/context.dev) SDK as [Vercel AI SDK](https://ai-sdk.dev) tools. It is not published or maintained by context.dev — see [context.dev](https://www.context.dev/) and [docs.context.dev](https://docs.context.dev) for their official SDKs and MCP server.
 
 Vercel AI SDK `tool()` wrappers for [context.dev](https://www.context.dev/)'s live web data API: search, scrape, crawl, structured extraction, document parsing, screenshots, brand intelligence, and news — ready to drop into `generateText`/`streamText`. Every example below was run against the real context.dev API; the sample output is real (trimmed for length), not illustrative.
@@ -294,6 +297,7 @@ Fully typed — every tool's input schema is a Zod object, and `contextTools()` 
 
 ## Links
 
+- [context-dev-ai-tools on npm](https://www.npmjs.com/package/context-dev-ai-tools)
 - [context.dev](https://www.context.dev/)
 - [context.dev docs](https://docs.context.dev)
 - [context.dev TypeScript SDK](https://github.com/context-dot-dev/context-typescript-sdk) (the dependency this package wraps)
