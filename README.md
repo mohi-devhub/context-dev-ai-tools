@@ -3,9 +3,9 @@
 [![npm version](https://img.shields.io/npm/v/context-dev-ai-tools.svg)](https://www.npmjs.com/package/context-dev-ai-tools)
 [![license](https://img.shields.io/npm/l/context-dev-ai-tools.svg)](./LICENSE)
 
-> **Community-built, unofficial.** This package wraps the official [`context.dev`](https://www.npmjs.com/package/context.dev) SDK as [Vercel AI SDK](https://ai-sdk.dev) tools. It is not published or maintained by context.dev — see [context.dev](https://www.context.dev/) and [docs.context.dev](https://docs.context.dev) for their official SDKs and MCP server.
+> **Community-built, unofficial.** This package wraps the official [`context.dev`](https://www.npmjs.com/package/context.dev) SDK as [Vercel AI SDK](https://ai-sdk.dev) and [OpenAI Agents SDK](https://openai.github.io/openai-agents-js/) tools. It is not published or maintained by context.dev — see [context.dev](https://www.context.dev/) and [docs.context.dev](https://docs.context.dev) for their official SDKs and MCP server.
 
-Vercel AI SDK `tool()` wrappers for [context.dev](https://www.context.dev/)'s live web data API: search, scrape, crawl, structured extraction, document parsing, screenshots, brand intelligence, and news — ready to drop into `generateText`/`streamText`. Every example below was run against the real context.dev API; the sample output is real (trimmed for length), not illustrative.
+Tool wrappers for [context.dev](https://www.context.dev/)'s live web data API: search, scrape, crawl, structured extraction, document parsing, screenshots, brand intelligence, and news — ready to drop into `generateText`/`streamText` (Vercel AI SDK) or an `Agent`'s `tools` array (OpenAI Agents SDK, via the [`./openai-agents`](#openai-agents-sdk) subpath). Every example below was run against the real context.dev API; the sample output is real (trimmed for length), not illustrative.
 
 ## Contents
 
@@ -23,6 +23,7 @@ Vercel AI SDK `tool()` wrappers for [context.dev](https://www.context.dev/)'s li
   - [contextBrand](#contextbrand)
   - [contextNews](#contextnews)
 - [The `contextTools()` bundle](#the-contexttools-bundle)
+- [OpenAI Agents SDK](#openai-agents-sdk)
 - [Error handling](#error-handling)
 - [Not included (v1 scope)](#not-included-v1-scope)
 - [TypeScript](#typescript)
@@ -282,6 +283,32 @@ const result = await generateText({
 ```
 
 `contextTools(config?)` applies the same config (API key, base URL) to every tool it returns.
+
+## OpenAI Agents SDK
+
+The same nine tools, wrapped for the [OpenAI Agents SDK](https://openai.github.io/openai-agents-js/) instead, from the `./openai-agents` subpath:
+
+```bash
+npm install @openai/agents
+```
+
+```ts
+import { Agent, run } from "@openai/agents";
+import { contextTools } from "context-dev-ai-tools/openai-agents";
+
+const agent = new Agent({
+  name: "Researcher",
+  instructions: "Use the available tools at most once each, then answer concisely with sources.",
+  tools: contextTools(),
+});
+
+const result = await run(agent, "What did Stripe announce this week? Cite the source URL.");
+console.log(result.finalOutput);
+```
+
+Individual tools (`contextSearch`, `contextScrape`, etc.) are also exported, same as the main entry point. `@openai/agents` is an optional peer dependency — install it only if you use this subpath.
+
+One difference from the main entry: `contextExtract`'s `schema` argument is an open-ended JSON Schema object, which OpenAI's strict structured-outputs mode can't represent (every property must be statically named). That one tool runs in non-strict mode; the rest use OpenAI's strict mode as usual.
 
 ## Error handling
 
