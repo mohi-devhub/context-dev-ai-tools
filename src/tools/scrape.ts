@@ -14,11 +14,14 @@ const inputSchema = z.object({
     .describe("Strip navigation, ads, and boilerplate, keeping only the main article/content region."),
 });
 
-export const contextScrape = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function scrapeToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Scrape a single URL and return clean Markdown with navigation and ads stripped, ready for LLM context.",
     inputSchema,
-    execute: async (input) => callContext(() => client.web.webScrapeMd(input)),
-  });
-};
+    execute: async (input: z.infer<typeof inputSchema>) => callContext(() => client.web.webScrapeMd(input)),
+  };
+}
+
+export const contextScrape = (config: ContextToolConfig = {}) => tool(scrapeToolSpec(config));

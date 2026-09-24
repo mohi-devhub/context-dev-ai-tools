@@ -19,17 +19,20 @@ const inputSchema = z.object({
     .describe("For PDFs, OCR pages that have no usable text layer (scans) instead of skipping them."),
 });
 
-export const contextParse = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function parseToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Parse an uploaded document (PDF, DOCX, PPTX, XLSX, HTML, CSV, and more) into clean Markdown.",
     inputSchema,
-    execute: async ({ fileBase64, extension, ...rest }) =>
+    execute: async ({ fileBase64, extension, ...rest }: z.infer<typeof inputSchema>) =>
       callContext(async () =>
         client.parse.handle(await toFile(Buffer.from(fileBase64, "base64")), {
           ...rest,
           extension: extension as ParseHandleParams["extension"],
         }),
       ),
-  });
-};
+  };
+}
+
+export const contextParse = (config: ContextToolConfig = {}) => tool(parseToolSpec(config));

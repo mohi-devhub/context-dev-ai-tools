@@ -29,11 +29,14 @@ const inputSchema = z.object({
     .describe("When true, also follow links on subdomains of the starting URL's domain."),
 });
 
-export const contextCrawl = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function crawlToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Crawl a website starting from a URL and return clean Markdown for every reachable page, up to the given limits.",
     inputSchema,
-    execute: async (input) => callContext(() => client.web.webCrawlMd(input)),
-  });
-};
+    execute: async (input: z.infer<typeof inputSchema>) => callContext(() => client.web.webCrawlMd(input)),
+  };
+}
+
+export const contextCrawl = (config: ContextToolConfig = {}) => tool(crawlToolSpec(config));

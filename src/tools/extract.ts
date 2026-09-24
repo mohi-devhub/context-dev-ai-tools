@@ -17,11 +17,14 @@ const inputSchema = z.object({
     .describe("When true, every returned value must be grounded in facts stated on the page; ungrounded fields come back null/empty."),
 });
 
-export const contextExtract = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function extractToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Extract structured data from a URL according to a JSON Schema you provide.",
     inputSchema,
-    execute: async (input) => callContext(() => client.web.extract(input)),
-  });
-};
+    execute: async (input: z.infer<typeof inputSchema>) => callContext(() => client.web.extract(input)),
+  };
+}
+
+export const contextExtract = (config: ContextToolConfig = {}) => tool(extractToolSpec(config));

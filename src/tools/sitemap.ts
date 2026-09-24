@@ -19,11 +19,14 @@ const inputSchema = z.object({
     .describe("Maximum number of links to return. Defaults to 10,000."),
 });
 
-export const contextSitemap = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function sitemapToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Discover a website's URLs via its sitemap, optionally filtered by a search phrase or regex. Useful for planning a crawl before running contextCrawl.",
     inputSchema,
-    execute: async (input) => callContext(() => client.web.webScrapeSitemap(input)),
-  });
-};
+    execute: async (input: z.infer<typeof inputSchema>) => callContext(() => client.web.webScrapeSitemap(input)),
+  };
+}
+
+export const contextSitemap = (config: ContextToolConfig = {}) => tool(sitemapToolSpec(config));

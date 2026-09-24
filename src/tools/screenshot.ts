@@ -16,12 +16,13 @@ const inputSchema = z
     message: "Provide exactly one of `domain` or `directUrl`.",
   });
 
-export const contextScreenshot = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function screenshotToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Capture a screenshot of a webpage (full page or viewport) and return an image URL.",
     inputSchema,
-    execute: async ({ domain, directUrl, fullScreenshot, ...rest }) =>
+    execute: async ({ domain, directUrl, fullScreenshot, ...rest }: z.infer<typeof inputSchema>) =>
       callContext(() =>
         client.web.screenshot({
           ...rest,
@@ -31,5 +32,7 @@ export const contextScreenshot = (config: ContextToolConfig = {}) => {
           }),
         }),
       ),
-  });
-};
+  };
+}
+
+export const contextScreenshot = (config: ContextToolConfig = {}) => tool(screenshotToolSpec(config));

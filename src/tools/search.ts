@@ -24,14 +24,17 @@ const inputSchema = z.object({
     .describe("Two-letter ISO 3166-1 alpha-2 country code to localize results, e.g. 'us', 'gb', 'de'."),
 });
 
-export const contextSearch = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function searchToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Search the live web and get back structured results (title, url, snippet) using context.dev's real-time search index.",
     inputSchema,
-    execute: async ({ country, ...rest }) =>
+    execute: async ({ country, ...rest }: z.infer<typeof inputSchema>) =>
       callContext(() =>
         client.web.search({ ...rest, country: country as WebSearchParams["country"] }),
       ),
-  });
-};
+  };
+}
+
+export const contextSearch = (config: ContextToolConfig = {}) => tool(searchToolSpec(config));

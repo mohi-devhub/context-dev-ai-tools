@@ -14,12 +14,13 @@ const inputSchema = z.object({
   sortBy: z.enum(["relevance", "newest"]).optional().describe("Result ordering. Defaults to 'newest'."),
 });
 
-export const contextNews = (config: ContextToolConfig = {}) => {
+/** Shared with the `./openai-agents` subpath so both frameworks wrap the same schema and execute logic. */
+export function newsToolSpec(config: ContextToolConfig = {}) {
   const client = createClient(config);
-  return tool({
+  return {
     description: "Search recent news articles about a company, identified by name, domain, or stock ticker.",
     inputSchema,
-    execute: async ({ entity, entityType, limit, sortBy }) =>
+    execute: async ({ entity, entityType, limit, sortBy }: z.infer<typeof inputSchema>) =>
       callContext(() =>
         client.news.search({
           searchBy: {
@@ -35,5 +36,7 @@ export const contextNews = (config: ContextToolConfig = {}) => {
           sortBy: sortBy ? { type: sortBy } : undefined,
         }),
       ),
-  });
-};
+  };
+}
+
+export const contextNews = (config: ContextToolConfig = {}) => tool(newsToolSpec(config));
